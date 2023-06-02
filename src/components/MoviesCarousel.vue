@@ -1,14 +1,9 @@
 <template>
-  <div v-if="isLoading">
-  <p class="loading-msg">Loading Movies</p></div>
+  <div v-if="loading">
+    <Loader />
+  </div>
   <div v-else>
-    <Carousel
-      :items-to-show="3"
-      :wrapAround="true"
-      :itemsToScroll="1"
-      :snapAlign="'center'"
-      :modelValue="4"
-    >
+    <Carousel :settings="settings" :breakpoints="breakpoints">
       <Slide v-for="film in films" :key="film">
         <div class="movies-carousel">
           <CardComponent
@@ -18,7 +13,8 @@
             :release="formatDate(film.release_date)"
             :movie="true"
           >
-            <img :src="images[film.episode_id - 1]" alt="" />
+            <!-- <img :src="images[film.episode_id - 1]" alt="" /> -->
+            <img :src="imageUrl(film.episode_id)" />
           </CardComponent>
         </div>
       </Slide>
@@ -34,30 +30,41 @@
 import CardComponent from './CardComponent.vue';
 import SwapiController from '../controller/SwapiController';
 import { ref, defineEmits } from 'vue';
-import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
+import { Carousel, Slide, Navigation } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
-import episode_1 from '../assets/episode_1.jpg';
-import episode_2 from '../assets/episode_2.jpg';
-import episode_3 from '../assets/episode_3.jpg';
-import episode_4 from '../assets/episode_4.jpg';
-import episode_5 from '../assets/episode_5.jpg';
-import episode_6 from '../assets/episode_6.jpg';
+import Loader from './Loader.vue';
 
 const swapiController = new SwapiController();
-let images = [episode_1, episode_2, episode_3, episode_4, episode_5, episode_6];
+let breakpoints = ref({
+  300: {
+    itemsToShow: 1,
+    wrapAround: true,
+  },
+  600:{
+    itemsToShow: 3,
+    wrapAround: true,
+  }
+});
 
-let isLoading = ref(false);
+const settings = ref({
+  itemsToShow: 3,
+  wrapAround: true,
+  itemsToScroll: 1,
+  snapAlign: 'center',
+  modelValue: 4,
+});
 
+const loading = ref(true);
 let films = ref([]);
 getMovies();
 
+const imageUrl = (id: number) =>
+  new URL(`/src/assets/episode_${id}.jpg`, import.meta.url).toString();
+
 function getMovies() {
-  isLoading.value = true;
   swapiController.getMovies().then((data) => {
-    films.value = data;
-    isLoading.value = false
-    
-    
+    films.value = data.data.results;
+    loading.value = false;
   });
 }
 
@@ -67,10 +74,10 @@ function formatDate(value: any) {
   return dateFormated;
 }
 
-const emit = defineEmits(['film'])
+const emit = defineEmits(['film']);
 
-function sendId(value: number){
-  emit('film', value)
+function sendId(value: number) {
+  emit('film', value);
 }
 </script>
 
@@ -78,6 +85,16 @@ function sendId(value: number){
 .movies-carousel {
   display: flex;
   flex-direction: row;
+}
+
+section.carousel{
+  @media only screen and (max-width: 600px) {
+    width: 90vw;   
+  }
+}
+
+.movies-carousel img:hover {
+  cursor: pointer;
 }
 
 img {
@@ -89,6 +106,12 @@ img {
   left: 5px;
   top: 10px;
   border-radius: 10px 10px 0px 0px;
-}
 
+  @media only screen and (max-width: 600px) {
+    width: 200px;
+    margin-right: 20px;
+    margin-left: 15px;
+    height: 305px;
+  }
+}
 </style>

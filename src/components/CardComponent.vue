@@ -7,7 +7,7 @@
     </div>
     <p class="title"  :class="movie ? '' : 'title-radius'">{{ title }}</p>
 
-    <div class="card">
+    <div class="card" :class="movie ? 'card-hover' : ''" >
   
       <div class="card-content">
         <template v-if="movie">
@@ -83,6 +83,15 @@ export default {
   padding: 0px;
 
   width: 270px;
+
+  @media only screen and (max-width: 600px) {
+    margin-left: 124px;
+    width: 201px; 
+  }
+}
+
+.card-hover:hover {
+  cursor: pointer;
 }
 
 p.title {
@@ -98,6 +107,11 @@ p.title {
   
 
   width: 270px;
+
+  @media only screen and (max-width: 600px) {
+    left: 124px;
+    width: 201px; 
+  }
 }
 
 .date{
