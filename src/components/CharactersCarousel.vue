@@ -40,7 +40,7 @@ const breakpoints = ref({
     wrapAround: true,
   },
   600: {
-    itemsToShow: 2,
+    itemsToShow: 3,
     wrapAround: true,
   },
 });
